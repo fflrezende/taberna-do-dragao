@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Taberna do Dragão</title>
+    <style>
+        body {
+            background: #F4E4BC; /* Bege claro, como pergaminho */
+            color: #3C2F2F; /* Marrom escuro pro texto */
+            font-family: 'Georgia', serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .taverna {
+            background: #F4E4BC;
+            padding: 20px;
+            margin: 50px auto;
+            width: 70%;
+            border: 5px solid #4A2C1A; /* Borda marrom escura */
+            box-shadow: 0 0 15px #000;
+        }
+        h1 {
+            font-family: 'Uncial Antiqua', 'Georgia', serif;
+            font-size: 36px;
+            color: #D4A017; /* Dourado pros títulos */
+            text-shadow: 2px 2px 4px #000;
+        }
+        h2 {
+            font-family: 'Uncial Antiqua', 'Georgia', serif;
+            color: #8A5522; /* Vermelho escuro pros subtítulos */
+        }
+        button {
+            background: #D4A017; /* Dourado pros botões */
+            color: #3C2F2F;
+            padding: 10px 20px;
+            border: 2px solid #4A2C1A;
+            font-family: 'Uncial Antiqua', 'Georgia', serif;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #E6B800; /* Dourado mais claro no hover */
+        }
+        input, textarea {
+            background: #FFF8E1; /* Bege mais claro pros campos */
+            color: #3C2F2F;
+            border: 2px solid #4A2C1A;
+            padding: 5px;
+            margin: 5px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1;
+        }
+        .modal-content {
+            background: #FFF8E1;
+            margin: 15% auto;
+            padding: 20px;
+            width: 50%;
+            border: 3px solid #4A2C1A;
+            box-shadow: 0 0 10px #000;
+        }
+        .close {
+            color: #D4A017;
+            float: right;
+            font-size: 28px;
+            cursor: pointer;
+        }
+        .logo {
+            margin: 20px auto;
+            width: 200px;
+            display: block;
+        }
+        #historico, #narrativa {
+            max-height: 200px;
+            overflow-y: scroll;
+            background: #FFF8E1;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #4A2C1A;
+        }
+        #mapa {
+            color: #5A6F47; /* Verde musgo pro mapa */
+            text-decoration: underline;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="login" class="taverna">
+        <img src="https://i.ibb.co/5Y5Y5Y5/dragon-baby-dice.png" alt="Dragão Bebê com Dado" class="logo">
+        <h1>Taberna do Dragão</h1>
+        <p>Entre, aventureiro, e junte-se à lenda!</p>
+        <input type="text" id="nome" placeholder="Nome"><br>
+        <input type="password" id="senha" placeholder="Senha"><br>
+        <button onclick="entrar()">Entrar na Taberna</button>
+    </div>
+
+    <div id="jogo" class="taverna" style="display: none;">
+        <img src="https://i.ibb.co/5Y5Y5Y5/dragon-baby-dice.png" alt="Dragão Bebê com Dado" class="logo">
+        <h1>Bem-vindo à Taberna do Dragão</h1>
+        <button onclick="toggleMusica()">Tocar Música da Taverna</button>
+        <audio id="musicaTaverna" loop>
+            <source src="https://drive.google.com/uc?export=download&id=1FPIv1C1C7sLqm1J-Taw-0V5AfA-ETFqN" type="audio/mpeg">
+        </audio>
+        <h2>Fichas dos Aventureiros</h2>
+        <div id="fichas">
+            <button onclick="abrirFicha('papa')">Ficha de Papa</button>
+            <button onclick="abrirFicha('presto')">Ficha de Presto</button>
+            <button onclick="abrirFicha('kaelthar')">Ficha de Kael’thar (NPC)</button>
+        </div>
+        <div id="papaModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="fecharFicha('papa')">×</span>
+                <h2>#Papa</h2>
+                <p>Clérigo de Wynna<br>
+                F: 1 | H: 2 | R: 1 | A: 1 | PdF: 0<br>
+                Vantagens: Clericato, Magia, PM Extra x2, Boa Fama<br>
+                Desvantagens: Cleptomania, Código de Honra<br>
+                Equipamento: Cajado rúnico, manto rasgado, pingente</p>
+            </div>
+        </div>
+        <div id="prestoModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="fecharFicha('presto')">×</span>
+                <h2>#Presto</h2>
+                <p>Mago Improvisador<br>
+                F: 0 | H: 3 | R: 1 | A: 0 | PdF: 1<br>
+                Vantagens: Magia, PM Extra x2, Adaptador, Sorte, Boa Fama, Ataque à Distância<br>
+                Desvantagens: Má Fama, Desajeitado<br>
+                Equipamento: Cajado torto, robe roxo, grimório, arco</p>
+            </div>
+        </div>
+        <div id="kaeltharModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="fecharFicha('kaelthar')">×</span>
+                <h2>Kael’thar (NPC)</h2>
+                <p>Guerreiro Místico<br>
+                F: 2 | H: 2 | R: 2 | A: 1 | PdF: 0<br>
+                Vantagens: Ataque Especial, Sentidos Especiais, Resistência à Magia, Parceiro, PV Extra x2, Perícia<br>
+                Desvantagens: Dever, Maldição Leve<br>
+                Equipamento: Lança Negra, armadura élfica leve</p>
+            </div>
+        </div>
+        <h2>Mapa de Kannilar</h2>
+        <p id="mapa" onclick="alert('Mapa de Kannilar: Uma cidade portuária com ruas de pedra, uma praça central com uma estátua de dragão, o templo de Wynna ao norte, e a loja Olirobes a leste.')">Ver Mapa</p>
+        <h2>Histórico da Aventura</h2>
+        <div id="historico">
+            <p><b>Capítulo 1: A Fuga Discreta</b><br>
+            O grupo se reuniu na praça de Kannilar durante o festival. Presto brilhou com sua apresentação mágica, arrecadando 83 moedas de prata, enquanto Papa usou sua cleptomania pra roubar um pergaminho selado e uma adaga de um agente da Seita da Cobra Negra. Kael’thar ficou de olho, garantindo a fuga. Eles escaparam pelas ruas laterais e se refugiaram no templo de Wynna, onde analisaram os itens: o pergaminho tem runas élficas e fala de “despertar” e “três caminhos”, e a adaga tem magia leve.</p>
+        </div>
+        <h2>Narração do Mestre</h2>
+        <div id="narrativa">
+            <p>A luz da manhã trespassa os vitrais do templo de Wynna, banhando o salão dos peregrinos em tons de âmbar e ouro. As borboletas esculpidas nas janelas parecem dançar na pedra, enquanto o aroma de ervas frescas do jardim lá fora se mistura ao leve cheiro de cinzas da lareira que se apagou durante a noite. Papa despeja as 132 moedas de prata sobre a mesa, o tilintar ecoando no silêncio. Presto, com um floreio exagerado, sugere ir à loja Olirobes, onde “o robe escolhe o bruxo”. Kael’thar, encostado na parede, murmura sobre a Seita da Cobra Negra, que pode estar atrás de vocês. A sacerdotisa idosa surge na entrada, oferecendo pão fresco e água, e pergunta: “O que os traz de volta ao nosso santuário?”</p>
+        </div>
+        <h2>Suas Ações</h2>
+        <button onclick="rolarDado()">Rolar D6</button>
+        <p id="resultado">Resultado: --</p>
+        <textarea id="acao" placeholder="Digite sua ação com #Papa ou #Presto" rows="4" cols="50"></textarea><br>
+        <button onclick="enviarAcao()">Enviar Ação</button>
+        <p id="acoes">Ações enviadas: Nenhuma ainda.</p>
+    </div>
+
+    <script>
+        let usuarios = {
+            "Felipe": "123",
+            "Samyr": "789",
+            "Mestre": "456"
+        };
+        let acoes = [];
+        let musicaTocando = false;
+
+        function entrar() {
+            let nome = document.getElementById("nome").value;
+            let senha = document.getElementById("senha").value;
+            if (usuarios[nome] && usuarios[nome] === senha) {
+                document.getElementById("login").style.display = "none";
+                document.getElementById("jogo").style.display = "block";
+                alert("Bem-vindo, " + nome + "!");
+            } else {
+                alert("Nome ou senha inválidos, aventureiro!");
+            }
+        }
+
+        function rolarDado() {
+            let resultado = Math.floor(Math.random() * 6) + 1;
+            document.getElementById("resultado").innerText = "Resultado: " + resultado;
+        }
+
+        function enviarAcao() {
+            let acao = document.getElementById("acao").value.trim();
+            if (acao.startsWith("#Papa") || acao.startsWith("#Presto")) {
+                acoes.push(acao);
+                document.getElementById("acoes").innerText = "Ações enviadas: " + acoes.join(" | ");
+                document.getElementById("acao").value = "";
+                if (acoes.length === 2) {
+                    document.getElementById("narrativa").innerHTML = "<p>Ações de #Papa e #Presto enviadas! Aguardando o Mestre narrar...</p>";
+                }
+            } else {
+                alert("Use #Papa ou #Presto no início da ação!");
+            }
+        }
+
+        function abrirFicha(personagem) {
+            document.getElementById(personagem + "Modal").style.display = "block";
+        }
+
+        function fecharFicha(personagem) {
+            document.getElementById(personagem + "Modal").style.display = "none";
+        }
+
+        function toggleMusica() {
+            let musica = document.getElementById("musicaTaverna");
+            if (musicaTocando) {
+                musica.pause();
+                musicaTocando = false;
+                document.querySelector("button[onclick='toggleMusica()']").innerText = "Tocar Música da Taverna";
+            } else {
+                musica.play();
+                musicaTocando = true;
+                document.querySelector("button[onclick='toggleMusica()']").innerText = "Parar Música da Taverna";
+            }
+        }
+    </script>
+</body>
+</html>
